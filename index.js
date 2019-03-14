@@ -1,7 +1,10 @@
 /* global d3 */
 var routes;
+var lollapalooza
 
 /* Inspired from book: Interactive Data Viz */
+
+//Reading Bus Route Data
 d3.json("CTA_BusRoutes.geojson", function(error, data) {
   if (error) {
     console.log(error);
@@ -13,8 +16,19 @@ d3.json("CTA_BusRoutes.geojson", function(error, data) {
   }});
 
 
+// Reading Lollapalooza Demand Data
+d3.json("lollapalooza.json", function(error, data) {
+  if (error) {
+    console.log(error);
+    console.log('just got an error!')
+  } else {
+    console.log(data);
+    lollapalooza = data;
+    make_line_chart(lollapalooza);
+  }});
 
-// Creating Map for Chicago 
+
+// Creating Map for Chicago
 function make_map(routes){
   var map_width = 600;
   var map_height = 600;
@@ -48,49 +62,7 @@ function make_map(routes){
 
 
 
-
-
-/*
-
-function make_scatterplot(data) {
-  var margin = {top: 20, right: 30, bottom: 30, left: 40},
-      width = 430 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom;
-
-  var projection = d3.geoMercator()
-    .scale(1100)
-    // Center the Map in Chicago
-    .center([87.6298, 41.8781])
-    .translate([width / 2, height / 2]);
-
-    var path = d3.geoPath()
-  .projection(projection);
-
-    // Set svg width & height
-    var svg = d3.select('svg')
-      .attr('width', width)
-      .attr('height', height);
-
-    // Add background
-    svg.append('rect')
-      .attr('class', 'background')
-      .attr('width', width)
-      .attr('height', height)
-      .on('click', clicked);
-
-  d3.json("CTA_BusRoutes.geojson", function(error, routes) {
-          g1.selectAll("path")
-            .data(topojson.object(routes, routes.objects.states).geometries)
-            .enter().append("path")
-            .attr("d", d3.geoPath().projection(projection))
-            .attr("fill", "transparent")
-            .style("stroke", "#333")
-            .style("stroke-width", ".2px")
-            .attr("class", "muns");
-          });
-
-
-
+function make_line_chart(dataset){
+  console.log('in line chart!')
 
 }
-*/

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+  <head>
+    <title>Bus Demand in Chicago</title>
+
+    <!-- Meta Tags  -->
+    <meta charset="utf-8">
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <link rel="stylesheet"
+    href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
+
+    <!-- D3/javascript -->
+    <script type="text/javascript" src="d3.js"></script>
+  </head>
+
+
+  <body>
+    <header class="header clearfix">
+        <nav class="navbar fixed-bottom navbar-expand navbar-light" style="background-color: #ffffff00;">
+        <a class="name" href="https://github.com/amirkazi"> Amir Kazi</a>
+        <div class = 'sources'>
+          <p> Data Sources:&nbsp
+          <a href = 'https://data.cityofchicago.org/Transportation/CTA-Ridership-Bus-Routes-Daily-Totals-by-Route/jyb9-n7fm'> Bus Demand</a>
+          &nbsp
+          <a href = 'https://data.cityofchicago.org/Transportation/CTA-Bus-Routes-kml/rytz-fq6y'> Bus Routes</a>
+          &nbsp
+          <a href = 'https://www.transitchicago.com/data/'> Other Sources </a></p>
+        </div>
+    </header>
+    <h1>Bus Demand in Chicago</h1>
+    <div class="map"></div>
+    <div class = "linechart"></div>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="//d3js.org/topojson.v1.min.js"></script>
+    <script type="module" src="index.js"></script>
+
+
+
+  </body>
+</html>
