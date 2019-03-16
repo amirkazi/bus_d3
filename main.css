@@ -1,0 +1,150 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+
+.lines {
+  stroke-width: 1;
+}
+
+
+.highlight {
+  color : red;
+  stroke: red;
+  stroke-width: 3;
+}
+
+.drop_down{
+  position: relative;
+  top: -250px;
+  left: 100px;
+  width: 50px;
+  height: 30px;
+}
+
+
+.content{
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  width: 100px;
+  min-height: 100px;
+  background: #ccc;
+}
+
+.first,
+.second {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.header{
+  position: absolute;
+  bottom: -60px;
+  right: -300px;
+  width: 700px;
+  height: 100px;
+
+}
+
+.axis path,
+.axis line {
+stroke: teal;
+shape-rendering: crispEdges;
+}
+.axis text {
+font-family: Optima, Futura, sans-serif;
+font-weight: bold;
+font-size: 9px;
+fill: teal;
+
+}
+
+.linechart
+{
+    border: 2px solid gray;
+}
+
+.label{
+  fill: black;
+
+}
+
+.label_text{
+  font-family: Optima, Futura, sans-serif;
+  font-weight: bold;
+  font-size: 9px;
+}
+
+.source{
+  font-family: Optima, Futura, sans-serif;
+  font-weight: bold;
+  font-size: 9px;
+}
+
+.title{
+  font-family: Optima, Futura, sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+
+}
+
+.tooltip {
+  font-family: Optima, Futura, sans-serif;
+  position: absolute;
+  text-align: center;
+  width: 10%;
+  height: 12px;
+  padding: 10px;
+  margin-top: -100px;
+  font: 10px sans-serif;
+  background: #ddd;
+  pointer-events: none;
+}
+
+.subtitle{
+  font-family: Optima, Futura, sans-serif;
+  font-weight: bold;
+  font-size: 15px;
+
+}
+
+.name{
+  font-family: Optima, Futura, sans-serif;
+  font-weight: bold;
+  font-size: 24px;
+  position: absolute;
+  bottom: -30px;
+  right:  50px;
+  width: 700px;
+  height: 100px;
+}
+
+
+div.map {
+  position: relative;
+  top: -180px;
+  left: 150px;
+  width: 700px;
+  height: 300px;
+}
+
+
+div.linechart{
+  position: absolute;
+  top: 150px;
+  left: 800px;
+}
+
+.line{
+  position: absolute;
+  top: 50px;
+  left: 790px;
+
+}
