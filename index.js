@@ -1,44 +1,53 @@
-/* global d3 */
-var routes;
-var lollapalooza
-var bus_list
-
-/* Inspired from book: Interactive Data Viz */
-
-//Reading Bus Route Data
-d3.json("CTA_BusRoutes.geojson", function(error, data) {
-  if (error) {
-    console.log(error);
-    console.log('just got an error!')
-  } else {
-    console.log(data);
-    routes = data;
-    make_map(routes);
-  }});
 
 
-// Reading Lollapalooza Demand Data
-d3.json("lollapalooza.json", function(error, data) {
-  if (error) {
-    console.log(error);
-    console.log('just got an error!')
-  } else {
-    console.log(data);
-    lollapalooza = data;
-    make_line_chart(lollapalooza);
-  }});
+document.addEventListener('DOMContentLoaded', () => {
+  // this uses a structure called a promise to asyncronously get the data set
+  // use Promise.all to load in more than one dataset
+  Promise.all([
+      './data/CTA_BusRoutes.geojson',
+      './data/neighborhoods_2012.geojson',
+      './data/bus_list.json',
+      './data/lollapalooza.json',
+      './data/monthly_usage.json',
+      './data/daily_usage.json'
+    ].map(url => fetch(url).then(data => data.json())))
+      .then(data => myVis(data))
+    .catch(function(error){
+        console.log(`An unexpected error occured: ${error}`,error);
+    });
+});
 
 
-// Reading List of Buses
-d3.csv("bus_list.csv", function(error, data) {
-  if (error) {
-    console.log(error);
-    console.log('just got an error!')
-  } else {
-    console.log(data);
-    bus_list = data;
-    make_drop_down(bus_list);
-  }});
+
+function myVis(data) {
+  var [routes, neighborhoods, bus_list, lollapalooza_usage, monthly_usage,
+      daily_usage] = data;
+
+  // set the dimensions and margins of the graph
+  var margin = {top: 50, right: 50, bottom: 50, left: 50},
+      width = 900 - margin.left - margin.right,
+      height = 1300 - margin.top - margin.bottom;
+
+  // makes routes map from
+  make_map(neighborhoods, true);
+  make_map(routes, false);
+
+  // make line chart
+  make_line_chart(lollapalooza_usage);
+
+  //make drop down
+  make_drop_down(bus_list)
+
+
+  console.log ("This works");
+}
+
+
+
+
+// d3.select("#button_id").on("click", updateFunction(bus_list));
+
+
 
 
 //making drop down menu
@@ -53,27 +62,44 @@ function make_drop_down(dataset){
 		.data(dataset)
 		.enter().append("option")
 		.text(function(d) { return d.bus_route_name; })
-		.attr("value", function (d) {return d.bus_route_name})
-    // .on("change",  function() {
-    //                   var selection = eval(d3.select(this).property('value'));
-    //                   use_drop_down(selection)});
-    .on("change", function(d){console.log('drop down changed')});
-}
+		.attr("value", function (d) {return d.bus_route_name});
 
-function use_drop_down(selection){
-  console.log(selection);
-  console.log("john cena");
-}
+    d3.select("#bus_selector").on("change", function() {
+
+      var value = d3.select(this)
+        .property("value")
+
+      highlight_map_route(value);
+      highlight_line_chart_route(value);
+    });
+};
 
 
-
-// Creating Map for Chicago
-function make_map(routes){
+//
+// function dropdownChange(route) {
+//   highlight_map_route(route);
+//   highlight_line_chart_route(route);
+// }
+//
+//
+// //
+// // var dropdownChange = function() {
+// //                     var newCereal = d3.select(this).property('value'),
+// //                         newData   = cerealMap[newCereal];
+// //
+// //                     updateBars(newData);
+// //                 };
+//
+//
+//
+// Creating Map
+function make_map(routes, isNeighborhoods){
   var map_width = 600;
   var map_height = 1100;
 
   // with help from:
   // https://gis.stackexchange.com/questions/180675/d3-center-a-map-feature-using-correct-latitude-and-longitude-without-rotation
+  // https://d3indepth.com/geographic/
   var projection = d3.geoAlbers()
                     .scale(99000)
                     .center([0, 41.83])
@@ -85,29 +111,32 @@ function make_map(routes){
 
   var tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")
-    .style("opacity", 60);
+    .style("opacity", 0);
 
   var svg_map = d3.select(".map")
         .append("svg")
+        .style('position', isNeighborhoods ? 'absolute' : 'relative')
         .attr("width", map_width)
-        .attr("height", map_height)
-        .selectAll('path')
+        .attr("height", map_height);
+
+    svg_map.selectAll('path')
         .data(routes.features)
         .enter()
         .append('path')
         .attr("class","route_class")
         .attr("d", geoGenerator)
         .attr("id", function(d) { return "bus" + d.properties.ROUTE;})
-        .attr('stroke', 'black')
-        .attr('fill', "white")
-        // .style("stroke-width", "1")
+        .attr('stroke', 'grey')
+        .attr('fill', isNeighborhoods ? 'silver' : "white")
+        .attr('fill-opacity', isNeighborhoods ? 0.6 : 0)
+        .attr('stroke-opacity', isNeighborhoods ? 0 : 1)
         .on("mouseover", function(d) {
             tooltip.transition()
             .duration(200)
             .style("opacity", 20);
             tooltip.html(d.properties.ROUTE + ": " + d.properties.Name)
-            .style("left", (d3.event.pageX) + "px")
-            .style("top", (d3.event.pageY + 40) + "px");
+            .style("left", (d3.event.pageX ) + "px")
+            .style("top", (d3.event.pageY + 60) + "px");
           })
         .on("mouseout", function(d) {
             tooltip.transition()
@@ -121,34 +150,40 @@ function make_map(routes){
 }
 
 
-
-
 function highlight_map_route(route){
   console.log("route over here:");
   console.log(route);
   d3.selectAll(".route_class").classed("highlight", false);
   d3.select("#bus" + route).classed("highlight", true);
-
-
-  // //d3.selectAll("route_class").classed("highlight", false);
-  // d3.select("route").classed("highlight", true);
-  //
-  // d3.selectAll("route_class").transition()
-  // .style('fill', 'red')
-  // //d3.select(route).classed("highlight", true);
-  //
-  // //d3.selectAll("line_class").classed("highlight", false);
-  // //d3.select("#line" + route).classed("highlight", true);
-
-
-
 };
+
 
 function highlight_line_chart_route(route){
     d3.selectAll(".lines").classed("highlight", false);
     d3.select("#line" + route).classed("highlight", true);
 };
 
+
+
+
+
+function find_domain (data, key){
+  //https://stackoverflow.com/questions/8864430/compare-javascript-array-of-objects-to-get-min-max
+  var min_value = Infinity;
+  var max_value = -Infinity;
+  var tmp;
+
+  for (var i=0; i<data.length; i++) {
+      tmp = data[i].demand;
+      var ponka;
+      for (var j = 0; j < tmp.length; j++){
+        ponka = tmp[j][key];
+        if (ponka < min_value) {min_value = ponka;}
+        if (ponka > max_value) {max_value = ponka;}
+      }
+  }
+  return [min_value, max_value]
+};
 
 
 function make_line_chart(data){
@@ -180,10 +215,8 @@ function make_line_chart(data){
    .x(function(d) { return x(d.days)})
    .y(function(d) { return y(d.riders)});
 
-   //x.domain(d3.extent(data, function(d) { return d.demand[0].days }));
-   x.domain(d3.extent(data, function(d) { return d.demand[1].days }));
-   y.domain(d3.extent(data, function(d) { return d.demand[1].riders } ));
-
+   x.domain(find_domain (data, "days"));
+   y.domain(find_domain (data, "riders"));
 
    g.append("g")
       .attr("transform", "translate(0," + height + ")")
@@ -203,13 +236,6 @@ function make_line_chart(data){
      .attr("font-size", "18px")
      .text("Number of Bus Riders");
 
-     console.log("This Data!");
-     console.log(data);
-     console.log(data.filter(function(item) { return item.route == "1"}));
-     var lim = data.filter(function(item) { return item.route == "1"});
-     console.log(lim[0].demand);
-     var demand = lim[0].demand;
-
      d3.select("#linechart_g")
       .selectAll(".lines")
       .data(data, function(d) {return d.route})
@@ -218,71 +244,34 @@ function make_line_chart(data){
       .attr("class","lines")
       .attr("d", function(d) { return line(d.demand)})
       .attr("fill", "none")
-      .attr("stroke", "black")
+      .attr("stroke", "grey")
       .attr("id", function(d) { return ( "line" + d.route )});
 
 
-     // g.data(data)
-     //   .enter()
-     //   .datum(function(d) {return d.demand[1]})
-     //   //.datum(function(d) {return d})
-     //   .append("path")
-     //   .attr("d", line)
-     //   .attr("fill", 'blue')
-     //   .attr("id", function(d) { return ( "line" + d.route )});
-
-
-/*
-    g.data(data)
-      .enter()
-      .datum(function(d) {return d.demand})
-      .append("path")
-      .attr("d", line)
-      .attr("class", "line_class")
-      .attr("id", function(d) { return ( "line" + d.route )});
-
-      */
 };
-
-
-/*
-
-
-
-
-// Handler for dropdown value change
-var dropdownChange = function() {
-    var newCereal = d3.select(this).property('value'),
-        newData   = cerealMap[newCereal];
-
-    updateBars(newData);
-};
-
-
-function drop_down(bus_list){
-  var sorted_bus_list = Object.keys(bus_list).sort();
-
-  var dropdown = d3.select("#vis-container")
-                    .insert("select", "svg")
-                    .on("change", dropdownChange);
-
-
-
-Ignore old debugs:
-//d3.select("X49").attr("fill", "#ccc");
-//console.log(d.properties.ROUTE);
-//d3.select(d.properties.ROUTE).classed("highlight", true);
-//d3.selectAll(".route_class").classed("highlight", true).moveToFront();
-//console.log("path#" + d.properties.ROUTE + ".route_class");
-//d3.select("path#" + d.properties.ROUTE + ".route_class").classed("highlight", true);
-//d3.select("#" + d.properties.ROUTE + ".route_class").classed("highlight", true);
-//d3.select("#" + d.properties.ROUTE).classed("highlight", true);
-//d3.select("#X49").classed("highlight", true);
-//d3.select("#J14").classed("highlight", true);
-//d3.select("#bus74").classed("highlight", true);
-//d3.select("#bus" + d.properties.ROUTE).classed("highlight", true);
-//console.log("button pressed")
-
-}
-
-*/
+//
+//
+// /*
+//
+//
+//
+//
+// // Handler for dropdown value change
+// var dropdownChange = function() {
+//     var newCereal = d3.select(this).property('value'),
+//         newData   = cerealMap[newCereal];
+//
+//     updateBars(newData);
+// };
+//
+//
+// function drop_down(bus_list){
+//   var sorted_bus_list = Object.keys(bus_list).sort();
+//
+//   var dropdown = d3.select("#vis-container")
+//                     .insert("select", "svg")
+//                     .on("change", dropdownChange);
+//
+//
+//
+// */

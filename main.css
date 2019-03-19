@@ -11,17 +11,20 @@ body {
 
 
 .highlight {
+  position: absolute;
   color : red;
   stroke: red;
-  stroke-width: 3;
+  stroke-width: 4;
+  z-index: 10;
 }
 
 .drop_down{
   position: relative;
   top: -250px;
-  left: 100px;
+  left: 0px;
   width: 50px;
   height: 30px;
+
 }
 
 
@@ -95,6 +98,13 @@ fill: teal;
 
 }
 
+.chicago{
+position: absolute;
+top: 200;
+left: 200;
+
+}
+
 .tooltip {
   font-family: Optima, Futura, sans-serif;
   position: absolute;
@@ -106,6 +116,7 @@ fill: teal;
   font: 10px sans-serif;
   background: #ddd;
   pointer-events: none;
+
 }
 
 .subtitle{
