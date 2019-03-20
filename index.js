@@ -32,22 +32,42 @@ function myVis(data) {
   make_map(neighborhoods, true);
   make_map(routes, false);
 
-  // make line chart
-  make_line_chart(lollapalooza_usage);
-
   //make drop down
-  make_drop_down(bus_list)
+  make_drop_down(bus_list);
+
+  // letting user decide through buttons
+  d3.select("#daily_button")
+  .on("click", function() { clean_up(daily_usage, "weekly") });
+
+  d3.select("#monthly_button")
+  .on("click", function() { clean_up(monthly_usage, "monthly") });
+
+  d3.select("#lolla_button")
+  .on("click", function() { clean_up(lollapalooza_usage, "lollapalooza") });
+
+};
 
 
-  console.log ("This works");
-}
 
+function clean_up(data, data_type) {
 
+  // with inspiration from:
+  // https://stackoverflow.com/questions/10784018/how-can-i-remove-or-replace-svg-content
 
+  // remove previous chart's svg elements
+      d3.select("#the_SVG_ID").remove();
 
-// d3.select("#button_id").on("click", updateFunction(bus_list));
+      if (data_type == "weekly"){
+        line_chart_time(data, data_type)
+      } else if (data_type == "monthly") {
+        line_chart_time(data, data_type);
+      } else if (data_type == "lollapalooza"){
+        make_line_chart_lolla(data, data_type)
+      };
 
+      d3.select("#bus_selector").property("value", "");
 
+};
 
 
 //making drop down menu
@@ -72,26 +92,13 @@ function make_drop_down(dataset){
       highlight_map_route(value);
       highlight_line_chart_route(value);
     });
+
+    d3.select("#bus_selector").property("value", "");
 };
 
 
-//
-// function dropdownChange(route) {
-//   highlight_map_route(route);
-//   highlight_line_chart_route(route);
-// }
-//
-//
-// //
-// // var dropdownChange = function() {
-// //                     var newCereal = d3.select(this).property('value'),
-// //                         newData   = cerealMap[newCereal];
-// //
-// //                     updateBars(newData);
-// //                 };
-//
-//
-//
+
+
 // Creating Map
 function make_map(routes, isNeighborhoods){
   var map_width = 600;
@@ -146,6 +153,9 @@ function make_map(routes, isNeighborhoods){
         .on("click", function(d) {
           highlight_map_route(d.properties.ROUTE);
           highlight_line_chart_route(d.properties.ROUTE);
+
+          d3.select("#bus_selector").property("value", d.properties.ROUTE);
+
         });
 }
 
@@ -162,8 +172,6 @@ function highlight_line_chart_route(route){
     d3.selectAll(".lines").classed("highlight", false);
     d3.select("#line" + route).classed("highlight", true);
 };
-
-
 
 
 
@@ -186,7 +194,7 @@ function find_domain (data, key){
 };
 
 
-function make_line_chart(data){
+function make_line_chart_lolla(data, data_type){
 
   // Inspiration from:
   // https://medium.freecodecamp.org/learn-to-create-a-line-chart-using-d3-js-4f43f1ee716b
@@ -201,6 +209,7 @@ function make_line_chart(data){
         .append("svg")
         .attr("width", chart_width)
         .attr("height", chart_height)
+        .attr("id","the_SVG_ID");
 
   var g = svg_line_chart.append("g")
                         .attr("transform",
@@ -209,7 +218,6 @@ function make_line_chart(data){
 
    var x = d3.scaleLinear().rangeRound([0, width]);
    var y = d3.scaleLinear().rangeRound([height, 0]);
-
 
    var line = d3.line()
    .x(function(d) { return x(d.days)})
@@ -222,7 +230,92 @@ function make_line_chart(data){
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x))
       .select(".domain");
-      //.remove();
+
+
+      g.append("g")
+       .call(d3.axisLeft(y))
+       .append("text")
+       .attr("fill", "#000")
+       .attr("transform", "rotate(-90)")
+       .attr("y", 6)
+       .attr("dy", "-4em")
+       .attr("dx", "-12em")
+       .attr("text-anchor", "middle")
+       .attr("font-size", "18px")
+       .text("Number of Bus Riders");
+
+     d3.select("#linechart_g")
+      .selectAll(".lines")
+      .data(data, function(d) {return d.route})
+      .enter()
+      .append("path")
+      .attr("class","lines")
+      .attr("d", function(d) { return line(d.demand)})
+      .attr("fill", "none")
+      .attr("stroke", "grey")
+      .attr("id", function(d) { return ( "line" + d.route )});
+
+      console.log("was in this function");
+
+
+};
+
+
+
+function line_chart_time(data, data_type){
+
+  var chart_width = 600, chart_height = 500;
+  var margin = { top: 40, right: 20, bottom: 50, left: 100 };
+  var width = chart_width - margin.left - margin.right;
+  var height = chart_height - margin.top - margin.bottom;
+
+  var svg_line_chart = d3.select(".linechart")
+        .append("svg")
+        .attr("width", chart_width)
+        .attr("height", chart_height)
+        .attr("id","the_SVG_ID");
+
+  var g = svg_line_chart.append("g")
+                        .attr("transform",
+                        "translate(" + margin.left + "," + margin.top + ")"
+                        ).attr("id","linechart_g");
+
+
+   var y = d3.scaleLinear().rangeRound([height, 0]);
+
+   if (data_type == "weekly"){
+     var x_axis = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+     var column = "day_of_week"
+   } else if (data_type == "monthly")  {
+     var x_axis = ["Jan", "Feb", "Mar" , "Apr" , "May" ,"Jun",
+                  "Jul", "Aug" , "Sep" ,"Oct" ,"Nov" ,"Dec"];
+    var column = "months";
+   }
+
+   console.log("x_axis")
+   console.log(x_axis)
+   console.log("column")
+   console.log(column)
+
+   console.log("data");
+   console.log(data);
+
+
+   var x = d3.scalePoint()
+              .domain(x_axis)
+              .range([ 0 , width ]);
+
+
+   var line = d3.line()
+   .x(function(d) { return x(d[column])})
+   .y(function(d) { return y(d.riders)});
+
+   y.domain(find_domain (data, "riders"));
+
+   g.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x))
+      .select(".domain");
 
     g.append("g")
      .call(d3.axisLeft(y))
@@ -247,8 +340,83 @@ function make_line_chart(data){
       .attr("stroke", "grey")
       .attr("id", function(d) { return ( "line" + d.route )});
 
+}
 
-};
+
+
+
+function line_chart_for_monthly(data, data_type){
+
+    var chart_width = 600, chart_height = 500;
+    var margin = { top: 40, right: 20, bottom: 50, left: 100 };
+    var width = chart_width - margin.left - margin.right;
+    var height = chart_height - margin.top - margin.bottom;
+
+
+    var svg_line_chart = d3.select(".linechart")
+          .append("svg")
+          .attr("width", chart_width)
+          .attr("height", chart_height)
+          .attr("id","the_SVG_ID");
+
+    var g = svg_line_chart.append("g")
+                          .attr("transform",
+                          "translate(" + margin.left + "," + margin.top + ")"
+     ).attr("id","linechart_g");
+
+     //var x = d3.scaleOrdinal().rangeRound([0, width]);
+     var y = d3.scaleLinear().rangeRound([height, 0]);
+
+     //var x_axis = ["Sat", "Sun", 'Mon', 'Tue', 'Wed', "Thu", "Fri"];
+     var x_axis = ["Jan", "Feb", "Mar" , "Apr" , "May" ,"Jun",
+                  "Jul", "Aug" , "Sep" ,"Oct" ,"Nov" ,"Dec"];
+     //var x_axis = ["Mon", "Sat", "Sun"];
+
+     var x = d3.scalePoint() //is there an issue that I use scalePoint instead of scaleBand?
+    .domain(x_axis)
+    .range([ 0 , width ]);
+
+
+     var line = d3.line()
+     .x(function(d) { return x(d.months)})
+     .y(function(d) { return y(d.riders)});
+
+
+     //x.domain(x_axis);
+     y.domain(find_domain (data, "riders"));
+
+     g.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x))
+        .select(".domain");
+        //.remove();
+
+      g.append("g")
+       .call(d3.axisLeft(y))
+       .append("text")
+       .attr("fill", "#000")
+       .attr("transform", "rotate(-90)")
+       .attr("y", 6)
+       .attr("dy", "-4em")
+       .attr("dx", "-12em")
+       .attr("text-anchor", "middle")
+       .attr("font-size", "18px")
+       .text("Number of Bus Riders");
+
+       d3.select("#linechart_g")
+        .selectAll(".lines")
+        .data(data, function(d) {return d.route})
+        .enter()
+        .append("path")
+        .attr("class","lines")
+        .attr("d", function(d) { return line(d.demand)})
+        .attr("fill", "none")
+        .attr("stroke", "grey")
+        .attr("id", function(d) { return ( "line" + d.route )});
+
+}
+
+
 //
 //
 // /*

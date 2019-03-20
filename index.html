@@ -13,8 +13,8 @@
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="main.css">
 
-    <link rel="stylesheet"
-    href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
+    <!-- <link rel="stylesheet"
+    href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />  -->
 
     <!-- D3/javascript -->
     <script type="text/javascript" src="d3.js"></script>
@@ -39,29 +39,37 @@
 
     <div id='content'>
         <h4> Select a category! </h4>
-      <div class = 'buttons'
-      <div id="lolla_button">
-          <input name="LollapaloozaButton"
-           type="button"
-           value="Lollapalooza"
-           onclick="Lollapalooza()" />
-     </div>
-    <div id="monthly_button">
-        <input name="Monthly"
-         type="button"
-         value="Monthly"
-         onclick="Monthly()" />
-   </div>
-    <div id="daily_button" >
-        <input name="Weekly"
-         type="button"
-         value="Weekly"
-         onclick="Weekly()" />
+
+      <div class = 'buttons'>
+
+          <div id="monthly_button_div">
+              <input name="Monthly"
+               type="button"
+               value="Monthly"
+                id="monthly_button" />
+         </div>
+
+          <div id="daily_button_div" >
+              <input name="Daily"
+               type="button"
+               value="Daily"
+               id="daily_button" />
+          </div>
+
+          <div id="lolla_button_div">
+              <input name="Lollapalooza"
+               type="button"
+               value="Lollapalooza"
+               id="lolla_button"/>
+         </div>
+
       </div>
-   </div>
+
+    <div>
       <div class="map"></div>
       <div class = "linechart"></div>
       <div class = "drop_down"></div>
+    </div>
     </div>
     <script src="https://d3js.org/d3.v4.js"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
