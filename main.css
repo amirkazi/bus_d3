@@ -14,9 +14,24 @@ body {
 
 #text_for_bus{
   position: relative;
-  top: -230px;
-  left: 1px;
+  top: -200px;
+  left: 10px;
   align="right"
+
+}
+
+#text_for_button{
+  position: absolute;
+  top: 280px;
+  left: 18px;
+
+
+}
+
+.buttons{
+  position: relative;
+  top: 20px;
+  left: 10px;
 
 }
 
@@ -32,22 +47,22 @@ body {
 
 .drop_down{
   position: relative;
-  top: -250px;
-  left: 0px;
+  top: -200px;
+  left: 10px;
   width: 50px;
   height: 30px;
 
 }
 
 
-.content{
+/* .content{
   margin: 0;
   padding: 0;
   display: inline-block;
   width: 100px;
   min-height: 100px;
   background: #ccc;
-}
+} */
 
 .first,
 .second {
@@ -163,9 +178,9 @@ left: 200;
 
 div.map {
   position: relative;
-  top: -180px;
-  left: 150px;
-  width: 700px;
+  top: -280px;
+  left: 200px;
+  width: 750px;
   height: 300px;
   stroke: 2;
 }
@@ -173,7 +188,7 @@ div.map {
 
 div.linechart{
   position: absolute;
-  top: 150px;
+  top: 100px;
   left: 800px;
 }
 

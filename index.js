@@ -62,10 +62,12 @@ function clean_up(data, data_type) {
 
       if (data_type == "weekly"){
         line_chart_time(data, data_type)
+        what_data("DAILY");
       } else if (data_type == "monthly") {
+        what_data("MONTHLY");
         line_chart_time(data, data_type);
       } else if (data_type == "lollapalooza"){
-        //make_line_chart_lolla(data, data_type)
+        what_data("LOLLAPALOOZA");
         line_chart_time(data, data_type);
       };
 
@@ -81,6 +83,17 @@ function what_bus (value){
                           text("You have selected bus: " + value).
                           attr("id", "text_for_bus");
 }
+
+function what_data (value){
+  d3.select("#text_for_button").remove();
+  var text_on_selection = d3.select("body").
+                          append('p').
+                          text("You have selected " + value).
+                          attr("id", "text_for_button");
+}
+
+
+
 
 
 //making drop down menu
@@ -110,8 +123,10 @@ function make_drop_down(dataset){
 
     d3.select("#bus_selector").property("value", "");
 
-
-
+    // var text_on_selection = d3.select("body").
+    //                         append('p').
+    //                         text("Select a bus from the dropdown Or click a Route on The Map").
+    //                         attr("id", "text_for_dropdown");
 
 
 };
@@ -182,8 +197,6 @@ function make_map(routes, isNeighborhoods){
 
 
 function highlight_map_route(route){
-  console.log("route over here:");
-  console.log(route);
   d3.selectAll(".route_class").classed("highlight", false);
   d3.select("#bus" + route).classed("highlight", true);
 };
