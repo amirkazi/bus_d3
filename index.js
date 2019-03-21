@@ -56,16 +56,19 @@ function clean_up(data, data_type) {
 
   // remove previous chart's svg elements
       d3.select("#the_SVG_ID").remove();
+      d3.select("#bus_selector").property("value", "");
+      d3.selectAll(".route_class").classed("highlight", false);
 
       if (data_type == "weekly"){
         line_chart_time(data, data_type)
       } else if (data_type == "monthly") {
         line_chart_time(data, data_type);
       } else if (data_type == "lollapalooza"){
-        make_line_chart_lolla(data, data_type)
+        //make_line_chart_lolla(data, data_type)
+        line_chart_time(data, data_type);
       };
 
-      d3.select("#bus_selector").property("value", "");
+
 
 };
 
@@ -85,10 +88,8 @@ function make_drop_down(dataset){
 		.attr("value", function (d) {return d.bus_route_name});
 
     d3.select("#bus_selector").on("change", function() {
-
       var value = d3.select(this)
         .property("value")
-
       highlight_map_route(value);
       highlight_line_chart_route(value);
     });
@@ -194,77 +195,14 @@ function find_domain (data, key){
 };
 
 
-function make_line_chart_lolla(data, data_type){
-
-  // Inspiration from:
-  // https://medium.freecodecamp.org/learn-to-create-a-line-chart-using-d3-js-4f43f1ee716b
-
-  var chart_width = 600, chart_height = 500;
-  var margin = { top: 40, right: 20, bottom: 50, left: 100 };
-  var width = chart_width - margin.left - margin.right;
-  var height = chart_height - margin.top - margin.bottom;
-
-
-  var svg_line_chart = d3.select(".linechart")
-        .append("svg")
-        .attr("width", chart_width)
-        .attr("height", chart_height)
-        .attr("id","the_SVG_ID");
-
-  var g = svg_line_chart.append("g")
-                        .attr("transform",
-                        "translate(" + margin.left + "," + margin.top + ")"
-   ).attr("id","linechart_g");
-
-   var x = d3.scaleLinear().rangeRound([0, width]);
-   var y = d3.scaleLinear().rangeRound([height, 0]);
-
-   var line = d3.line()
-   .x(function(d) { return x(d.days)})
-   .y(function(d) { return y(d.riders)});
-
-   x.domain(find_domain (data, "days"));
-   y.domain(find_domain (data, "riders"));
-
-   g.append("g")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x))
-      .select(".domain");
-
-
-      g.append("g")
-       .call(d3.axisLeft(y))
-       .append("text")
-       .attr("fill", "#000")
-       .attr("transform", "rotate(-90)")
-       .attr("y", 6)
-       .attr("dy", "-4em")
-       .attr("dx", "-12em")
-       .attr("text-anchor", "middle")
-       .attr("font-size", "18px")
-       .text("Number of Bus Riders");
-
-     d3.select("#linechart_g")
-      .selectAll(".lines")
-      .data(data, function(d) {return d.route})
-      .enter()
-      .append("path")
-      .attr("class","lines")
-      .attr("d", function(d) { return line(d.demand)})
-      .attr("fill", "none")
-      .attr("stroke", "grey")
-      .attr("id", function(d) { return ( "line" + d.route )});
-
-      console.log("was in this function");
-
-
-};
-
 
 
 function line_chart_time(data, data_type){
 
-  var chart_width = 600, chart_height = 500;
+  // Inspiration from:
+  // https://medium.freecodecamp.org/learn-to-create-a-line-chart-using-d3-js-4f43f1ee716b
+
+  var chart_width = 700, chart_height = 700;
   var margin = { top: 40, right: 20, bottom: 50, left: 100 };
   var width = chart_width - margin.left - margin.right;
   var height = chart_height - margin.top - margin.bottom;
@@ -281,36 +219,40 @@ function line_chart_time(data, data_type){
                         ).attr("id","linechart_g");
 
 
-   var y = d3.scaleLinear().rangeRound([height, 0]);
-
    if (data_type == "weekly"){
      var x_axis = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
      var column = "day_of_week"
    } else if (data_type == "monthly")  {
      var x_axis = ["Jan", "Feb", "Mar" , "Apr" , "May" ,"Jun",
                   "Jul", "Aug" , "Sep" ,"Oct" ,"Nov" ,"Dec"];
-    var column = "months";
+     var column = "months";
+  } else if (data_type == "lollapalooza") {
+     var column = "days";
+  }
+
+
+   if (data_type == "lollapalooza") {
+     var x = d3.scaleLinear().rangeRound([0, width]);
+     var y = d3.scaleLinear().rangeRound([height, 0]);
+     x.domain(find_domain (data, "days"));
+   } else {
+     var x = d3.scalePoint()
+                .domain(x_axis)
+                .range([ 0 , width ]);
+
+     var y = d3.scaleLinear().rangeRound([height, 0]);
+
    }
 
-   console.log("x_axis")
-   console.log(x_axis)
-   console.log("column")
-   console.log(column)
 
-   console.log("data");
-   console.log(data);
-
-
-   var x = d3.scalePoint()
-              .domain(x_axis)
-              .range([ 0 , width ]);
+   y.domain(find_domain (data, "riders"));
 
 
    var line = d3.line()
    .x(function(d) { return x(d[column])})
    .y(function(d) { return y(d.riders)});
 
-   y.domain(find_domain (data, "riders"));
+
 
    g.append("g")
       .attr("transform", "translate(0," + height + ")")
@@ -341,105 +283,3 @@ function line_chart_time(data, data_type){
       .attr("id", function(d) { return ( "line" + d.route )});
 
 }
-
-
-
-
-function line_chart_for_monthly(data, data_type){
-
-    var chart_width = 600, chart_height = 500;
-    var margin = { top: 40, right: 20, bottom: 50, left: 100 };
-    var width = chart_width - margin.left - margin.right;
-    var height = chart_height - margin.top - margin.bottom;
-
-
-    var svg_line_chart = d3.select(".linechart")
-          .append("svg")
-          .attr("width", chart_width)
-          .attr("height", chart_height)
-          .attr("id","the_SVG_ID");
-
-    var g = svg_line_chart.append("g")
-                          .attr("transform",
-                          "translate(" + margin.left + "," + margin.top + ")"
-     ).attr("id","linechart_g");
-
-     //var x = d3.scaleOrdinal().rangeRound([0, width]);
-     var y = d3.scaleLinear().rangeRound([height, 0]);
-
-     //var x_axis = ["Sat", "Sun", 'Mon', 'Tue', 'Wed', "Thu", "Fri"];
-     var x_axis = ["Jan", "Feb", "Mar" , "Apr" , "May" ,"Jun",
-                  "Jul", "Aug" , "Sep" ,"Oct" ,"Nov" ,"Dec"];
-     //var x_axis = ["Mon", "Sat", "Sun"];
-
-     var x = d3.scalePoint() //is there an issue that I use scalePoint instead of scaleBand?
-    .domain(x_axis)
-    .range([ 0 , width ]);
-
-
-     var line = d3.line()
-     .x(function(d) { return x(d.months)})
-     .y(function(d) { return y(d.riders)});
-
-
-     //x.domain(x_axis);
-     y.domain(find_domain (data, "riders"));
-
-     g.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x))
-        .select(".domain");
-        //.remove();
-
-      g.append("g")
-       .call(d3.axisLeft(y))
-       .append("text")
-       .attr("fill", "#000")
-       .attr("transform", "rotate(-90)")
-       .attr("y", 6)
-       .attr("dy", "-4em")
-       .attr("dx", "-12em")
-       .attr("text-anchor", "middle")
-       .attr("font-size", "18px")
-       .text("Number of Bus Riders");
-
-       d3.select("#linechart_g")
-        .selectAll(".lines")
-        .data(data, function(d) {return d.route})
-        .enter()
-        .append("path")
-        .attr("class","lines")
-        .attr("d", function(d) { return line(d.demand)})
-        .attr("fill", "none")
-        .attr("stroke", "grey")
-        .attr("id", function(d) { return ( "line" + d.route )});
-
-}
-
-
-//
-//
-// /*
-//
-//
-//
-//
-// // Handler for dropdown value change
-// var dropdownChange = function() {
-//     var newCereal = d3.select(this).property('value'),
-//         newData   = cerealMap[newCereal];
-//
-//     updateBars(newData);
-// };
-//
-//
-// function drop_down(bus_list){
-//   var sorted_bus_list = Object.keys(bus_list).sort();
-//
-//   var dropdown = d3.select("#vis-container")
-//                     .insert("select", "svg")
-//                     .on("change", dropdownChange);
-//
-//
-//
-// */
