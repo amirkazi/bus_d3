@@ -6,7 +6,18 @@ body {
 
 
 .lines {
-  stroke-width: 1;
+  stroke-width: 2;
+  shape-rendering: crispEdges;
+  fill: none;
+}
+
+
+#text_for_bus{
+  position: relative;
+  top: -230px;
+  left: 1px;
+  align="right"
+
 }
 
 
@@ -14,6 +25,7 @@ body {
   position: absolute;
   color : red;
   stroke: red;
+  opacity : 10;
   stroke-width: 4;
   z-index: 10;
 }
@@ -103,6 +115,7 @@ position: absolute;
 top: 200;
 left: 200;
 
+
 }
 
 .tooltip {
@@ -131,11 +144,21 @@ left: 200;
   font-weight: bold;
   font-size: 24px;
   position: absolute;
-  bottom: -30px;
-  right:  50px;
+  bottom: -5px;
+  left:  -1190px;
   width: 700px;
   height: 100px;
 }
+
+.repo{
+  font-family: Optima, Futura, sans-serif;
+  font-weight: bold;
+  font-size: 24px;
+  position: absolute;
+  top: -500;
+
+}
+
 
 
 div.map {
@@ -144,6 +167,7 @@ div.map {
   left: 150px;
   width: 700px;
   height: 300px;
+  stroke: 2;
 }
 
 

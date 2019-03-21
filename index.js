@@ -56,6 +56,7 @@ function clean_up(data, data_type) {
 
   // remove previous chart's svg elements
       d3.select("#the_SVG_ID").remove();
+      d3.select("#text_for_bus").remove();
       d3.select("#bus_selector").property("value", "");
       d3.selectAll(".route_class").classed("highlight", false);
 
@@ -73,6 +74,15 @@ function clean_up(data, data_type) {
 };
 
 
+function what_bus (value){
+  d3.select("#text_for_bus").remove();
+  var text_on_selection = d3.select("body").
+                          append('p').
+                          text("You have selected bus: " + value).
+                          attr("id", "text_for_bus");
+}
+
+
 //making drop down menu
 function make_drop_down(dataset){
   //with help from:
@@ -87,14 +97,23 @@ function make_drop_down(dataset){
 		.text(function(d) { return d.bus_route_name; })
 		.attr("value", function (d) {return d.bus_route_name});
 
+
+
     d3.select("#bus_selector").on("change", function() {
       var value = d3.select(this)
         .property("value")
       highlight_map_route(value);
       highlight_line_chart_route(value);
+      what_bus(value);
+
     });
 
     d3.select("#bus_selector").property("value", "");
+
+
+
+
+
 };
 
 
@@ -156,6 +175,7 @@ function make_map(routes, isNeighborhoods){
           highlight_line_chart_route(d.properties.ROUTE);
 
           d3.select("#bus_selector").property("value", d.properties.ROUTE);
+          what_bus(d.properties.ROUTE);
 
         });
 }
