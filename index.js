@@ -299,7 +299,7 @@ function line_chart_time(data, data_type){
      .attr("transform", "rotate(-90)")
      .attr("y", 6)
      .attr("dy", "-4em")
-     .attr("dx", "-12em")
+     .attr("dx", "-18em")
      .attr("text-anchor", "middle")
      .attr("font-size", "18px")
      .text("Number of Bus Riders");
